@@ -9,7 +9,8 @@
 
 #include <inttypes.h>
 #include "color.h"
-#include "ws2812b.h"
+//#include "ws2812b.h"
+#include "sk6812.h"
 #include "ChunkTypes.h"
 
 #if 1 // =============================== Chunk =================================

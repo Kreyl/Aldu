@@ -6,7 +6,7 @@
 #include "uart.h"
 #include "lcd1200.h"
 #include "interface.h"
-#include "ws2812b.h"
+#include "sk6812.h"
 #include "IntelLedEffs.h"
 
 #if 1 // =============== Low level ================
@@ -83,10 +83,11 @@ void ITask() {
             case evtIdButtons:
 //                Printf("Btn %u\r", Msg.BtnEvtInfo.BtnID);
                 MenuHandler((Btns_t)Msg.BtnEvtInfo.BtnID);
+                BandA.AllTogetherSmoothly((Color_t){0,0,255,0}, 450);
                 break;
 
             case evtIdEverySecond:
-                BandA.AllTogetherNow(clGreen);
+//                BandA.AllTogetherNow((Color_t){0,255,0,0});
                 if(State == stIdle) {
                     Time.GetDateTime();
 //                    Time.Curr.Print();

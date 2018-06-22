@@ -1,14 +1,14 @@
 /*
- * ws2812b.h
+ * sk6812.h
  *
- *  Created on: 05 апр. 2014 г.
+ *  Created on: 19-07-2017 г.
  *      Author: Kreyl
  */
 
 #pragma once
 
 /*
- * ========== WS2812 control module ==========
+ * ========== SK2812 control module ==========
  * Only basic command "SetCurrentColors" is implemented, all other is up to
  * higher level software.
  * SPI input frequency should be 8 MHz (which results in 4MHz bitrate)
@@ -21,15 +21,14 @@
 #include "color.h"
 #include "uart.h"
 
-#define LED_CNT             24   // Number of WS2812 LEDs
+#define LED_CNT             100L   // Number of LEDs
 
-// Do not touch
-#define SEQ_LEN             4
-#define RST_W_CNT           4 // zero words before and after data to produce reset
+#define SEQ_LEN             4L   // SPI bits per single bit of LED data
+#define RST_W_CNT           8L   // zero words before and after data to produce reset
 
 // SPI16 Buffer (no tuning required)
-#define DATA_BIT_CNT        (LED_CNT * 3 * 8 * SEQ_LEN)   // Each led has 3 channels 8 bit each
-#define DATA_W_CNT          ((DATA_BIT_CNT + 15) / 16)
+#define DATA_BIT_CNT        (LED_CNT * 4 * 8 * SEQ_LEN) // Each led has 4 channels 8 bit each
+#define DATA_W_CNT          ((DATA_BIT_CNT + 15) / 16)  // Data len in 16-bit words
 #define TOTAL_W_CNT         (DATA_W_CNT + RST_W_CNT)
 
 #define NPX_DMA_MODE(Chnl) \
@@ -67,12 +66,11 @@ public:
     void Init();
     bool AreOff() {
         for(uint8_t i=0; i<LED_CNT; i++) {
-            if(ICurrentClr[i] != clBlack) return false;
+            if(ICurrentClr[i] != clRGBWBlack) return false;
         }
         return true;
     }
     // Inner use
     Color_t ICurrentClr[LED_CNT];
     void ISetCurrentColors();
-    void ITmrHandlerI();
 };

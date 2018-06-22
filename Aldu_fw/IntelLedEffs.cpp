@@ -65,6 +65,7 @@ void Effects_t::AllTogetherSmoothly(Color_t Color, uint32_t ASmoothValue) {
     else {
         ISmoothValue = ASmoothValue;
         for(int32_t i=0; i<LED_CNT; i++) DesiredClr[i] = Color;
+        State = effAllTogetherSmoothly;
         chVTSet(&Tmr, MS2ST(11), TmrEffCallback, this); // Arm timer for some time
     }
 }

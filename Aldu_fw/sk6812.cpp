@@ -5,29 +5,44 @@
  *      Author: Kreyl
  */
 
-#include "ws2812b.h"
+#include "sk6812.h"
 
 // Tx timings: bit cnt
-#define SEQ_1               0b1110  // 0xE
+/*
+bit len @ 4MHz: 250
+t0h 150...450       1
+t0l 750...1050      3? 4
+t1h 450...750       2
+t1l 450...750       2
+ */
+
 #define SEQ_0               0b1000  // 0x8
+#define SEQ_1               0b1100  // 0xC
 
 #define SEQ_00              0x88
 #define SEQ_01              0x8E
 #define SEQ_10              0xE8
 #define SEQ_11              0xEE
 
+// Wrapper for Tx Completed IRQ
+//extern "C"
+//void LedTxcIrq(void *p, uint32_t flags) {
+//    dmaStreamDisable(((Neopixels_t*)p)->Params->PDma);
+//}
+
 void Neopixels_t::Init() {
     PinSetupAlterFunc(Params->PGpio, Params->Pin, omPushPull, pudNone, Params->Af);
     Params->ISpi.Setup(boMSB, cpolIdleLow, cphaFirstEdge, sclkDiv4, bitn16);
     Params->ISpi.Enable();
     Params->ISpi.EnableTxDma();
-
     Printf("Led BufSz=%u bytes\r", sizeof(IBuf));
-
     // Zero buffer
-    for(int i=0; i<TOTAL_W_CNT; i++) IBuf[i] = 0;
+    for(uint32_t i=0; i<TOTAL_W_CNT; i++) IBuf[i] = 0;
+    // Set colors to black
+    for(uint32_t i=0; i<LED_CNT; i++) ICurrentClr[i] = clRGBWBlack;
 
     // ==== DMA ====
+//    dmaStreamAllocate     (Params->PDma, IRQ_PRIO_LOW, LedTxcIrq, this);
     dmaStreamAllocate     (Params->PDma, IRQ_PRIO_LOW, nullptr, nullptr);
     dmaStreamSetPeripheral(Params->PDma, &Params->ISpi.PSpi->DR);
     dmaStreamSetMode      (Params->PDma, Params->DmaMode);
@@ -71,6 +86,7 @@ void Neopixels_t::ISetCurrentColors() {
         AppendBitsMadeOfByte(ICurrentClr[i].G);
         AppendBitsMadeOfByte(ICurrentClr[i].R);
         AppendBitsMadeOfByte(ICurrentClr[i].B);
+        AppendBitsMadeOfByte(ICurrentClr[i].W);
     }
     // Start transmission
     dmaStreamDisable(Params->PDma);
