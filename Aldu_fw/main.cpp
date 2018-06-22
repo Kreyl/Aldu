@@ -6,6 +6,8 @@
 #include "uart.h"
 #include "lcd1200.h"
 #include "interface.h"
+#include "ws2812b.h"
+#include "IntelLedEffs.h"
 
 #if 1 // =============== Low level ================
 // Forever
@@ -25,6 +27,10 @@ enum Btns_t {btnUp=0, btnDown=1, btnPlus=2, btnMinus=3};
 static void MenuHandler(Btns_t Btn);
 static void EnterIdle();
 static void IndicateNewSecond();
+
+static const NeopixelParams_t LedParamsA(NPX_SPI_A, NPX_GPIO_A, NPX_PIN_A, NPX_AF_A, NPX_DMA_A, NPX_DMA_MODE(NPX_DMA_CHNL_A));
+Neopixels_t NpxA(&LedParamsA);
+Effects_t BandA(&NpxA);
 #endif
 
 int main() {
@@ -55,6 +61,10 @@ int main() {
 
     SimpleSensors::Init();
 
+    // Leds
+    NpxA.Init();
+    CommonEffectsInit();
+
     // ==== Main cycle ====
     ITask();
 }
@@ -76,6 +86,7 @@ void ITask() {
                 break;
 
             case evtIdEverySecond:
+                BandA.AllTogetherNow(clGreen);
                 if(State == stIdle) {
                     Time.GetDateTime();
 //                    Time.Curr.Print();

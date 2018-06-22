@@ -57,6 +57,12 @@
 #define LCD_BCKLT       { GPIOC, 9, TIM3, 4, invNotInverted, omPushPull, 100 }
 #define LCD_PWR         GPIOB, 11
 
+// Neopixel
+#define NPX_SPI_A       SPI2
+#define NPX_GPIO_A      GPIOC
+#define NPX_PIN_A       3
+#define NPX_AF_A        AF5
+
 // I2C
 #define I2C1_GPIO       GPIOB
 #define I2C1_SCL        6
@@ -127,6 +133,11 @@
 
 #define LCD_DMA         STM32_DMA2_STREAM6  // USART6 TX
 #define LCD_DMA_CHNL    5
+
+#define NPX_DMA_A       STM32_DMA1_STREAM4
+#define NPX_DMA_CHNL_A  0
+#define NPX_DMA_B       STM32_DMA1_STREAM5
+#define NPX_DMA_CHNL_B  0
 
 #if I2C1_ENABLED // ==== I2C1 ====
 #define I2C1_DMA_TX     STM32_DMA1_STREAM6
