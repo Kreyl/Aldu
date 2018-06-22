@@ -109,8 +109,11 @@ void Lcd_t::WriteCmd(uint8_t AByte) {
     for(uint8_t i=0; i<8; i++) {
         if(AByte & 0x80) SDA_Hi();
         else SDA_Lo();
+        __NOP();__NOP();__NOP();__NOP();
         SCLK_Hi();
+        __NOP();__NOP();__NOP();__NOP();
         SCLK_Lo();
+        __NOP();__NOP();__NOP();__NOP();
         AByte <<= 1;
     }
     XCS_Hi();

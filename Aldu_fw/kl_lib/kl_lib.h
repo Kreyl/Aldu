@@ -394,7 +394,7 @@ static inline void SetCounter(uint32_t CounterValue) {
     RTC->CNTL = (CounterValue & RTC_LSB_MASK);
     ExitConfigMode();
 }
-#elif defined STM32F072xB
+#elif defined STM32F072xB || defined STM32F2XX
 static inline void DisableWriteProtection() {
     RTC->WPR = 0xCAU;
     RTC->WPR = 0x53U;
@@ -1688,7 +1688,9 @@ public:
     void DisableHSI() { RCC->CR &= ~RCC_CR_HSION; }
     void DisablePLL() { RCC->CR &= ~RCC_CR_PLLON; }
     void EnableLsi();
+    void EnableLSE()  { RCC->BDCR |= RCC_BDCR_LSEON; }
     bool IsHSEEnabled() { return (RCC->CR & RCC_CR_HSERDY); }
+    bool IsLseOn()      { return (RCC->BDCR & RCC_BDCR_LSERDY); }
     // Dividers
     void SetupBusDividers(AHBDiv_t AHBDiv, APBDiv_t APB1Div, APBDiv_t APB2Div);
     uint8_t SetupPllMulDiv(uint8_t InputDiv_M, uint16_t Multi_N, PllSysDiv_P_t SysDiv_P, uint8_t UsbDiv_Q);
