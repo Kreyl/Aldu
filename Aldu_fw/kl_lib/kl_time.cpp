@@ -84,7 +84,7 @@ void TimeCounter_t::Init() {
             }
         } // while
     }
-    else Printf("Time is setup\r");
+    else Printf("Time is set\r");
     // Enable every-second-IRQ
     Rtc::ClearWakeupFlag(); // Otherwise already set flag will not trigger interrupt
 #if defined STM32F2XX
@@ -189,8 +189,9 @@ void TimeCounter_t::SetDateTime() {
     chSysLock();
     Rtc::DisableWriteProtection();
     Rtc::EnterInitMode();
-    RTC->DR = tmpD;
     RTC->TR = tmpT & RTC_TR_RESERVED_MASK;
+    RTC->DR = tmpD;
+    (void)RTC->DR; // Stinky magic to make data really be written in DR.
     Rtc::ExitInitMode();
 #if !defined STM32F2XX
     if(!(RTC->CR & RTC_CR_BYPSHAD))

@@ -96,13 +96,13 @@ void ITask() {
 void EnterIdle() {
     State = stIdle;
     TmrMenu.Stop();
-    Interface.DisplayDateTime();
-    Lcd.Backlight(0);
     // Save time if changed
     if(DateTimeHasChanged) {
         Time.SetDateTime();
         IndicateNewSecond();
     }
+    Interface.DisplayDateTime();
+    Lcd.Backlight(0);
 }
 
 void IndicateNewSecond() {
