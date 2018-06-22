@@ -48,6 +48,15 @@
 #define BTN3_PIN        GPIOB, 5
 #define BTN4_PIN        GPIOB, 8
 
+// LCD
+#define LCD_SDA         GPIOC, 6
+#define LCD_XRES        GPIOC, 7
+#define LCD_SCLK        GPIOC, 8
+#define LCD_AF          AF8
+#define LCD_XCS         GPIOB, 12
+#define LCD_BCKLT       { GPIOC, 9, TIM3, 4, invNotInverted, omPushPull, 100 }
+#define LCD_PWR         GPIOB, 11
+
 // I2C
 #define I2C1_GPIO       GPIOB
 #define I2C1_SCL        6
@@ -116,6 +125,8 @@
                             STM32_DMA_CR_DIR_P2M |    /* Direction is peripheral to memory */ \
                             STM32_DMA_CR_CIRC         /* Circular buffer enable */)
 
+#define LCD_DMA         STM32_DMA2_STREAM6  // USART6 TX
+#define LCD_DMA_CHNL    5
 
 #if I2C1_ENABLED // ==== I2C1 ====
 #define I2C1_DMA_TX     STM32_DMA1_STREAM6
@@ -147,5 +158,9 @@
     USART1, UART_GPIO, UART_TX_PIN, UART_GPIO, UART_RX_PIN, \
     UART_DMA_TX, UART_DMA_RX, UART_DMA_TX_MODE(UART_DMA_CHNL), UART_DMA_RX_MODE(UART_DMA_CHNL)
 
+// LCD USART
+#define LCD_UART        USART6
+#define LCD_UART_SPEED  100000
+#define LCD_UART_EN()   rccEnableUSART6(FALSE)
 
 #endif

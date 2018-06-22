@@ -1990,11 +1990,13 @@ void Clk_t::SetCoreClk(CoreClk_t CoreClk) {
     switch(CoreClk) {
         case cclk8MHz:
             break;
+        case cclk12MHz:
+            break;
         // Setup PLL (must be disabled first)
         case cclk16MHz:
-            // 12MHz / 6 * 192 / (6 and 8) => 64 and 48MHz
-            if(SetupPllMulDiv(6, 192, pllSysDiv6, 8) != retvOk) return;
-            SetupBusDividers(ahbDiv4, apbDiv1, apbDiv1); // 16 MHz AHB, 16 MHz APB1, 16 MHz APB2
+            // 12MHz / 12 * 192 / (6 and 4) => 32 and 48MHz
+            if(SetupPllMulDiv(12, 192, pllSysDiv6, 4) != retvOk) return;
+            SetupBusDividers(ahbDiv2, apbDiv1, apbDiv1); // 16 MHz AHB, 16 MHz APB1, 16 MHz APB2
             SetupFlashLatency(16);
             break;
         case cclk24MHz:

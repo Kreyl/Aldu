@@ -27,22 +27,22 @@
  */
 
 // ================================= Settings ==================================
-#define BUTTONS_CNT                 3
+#define BUTTONS_CNT                 4
 // Select required events etc.
-#define BTN_SHORTPRESS              FALSE    // beShortPress evt
-#define BTN_RELEASE                 TRUE
+#define BTN_SHORTPRESS              TRUE    // beShortPress evt
+#define BTN_RELEASE                 FALSE
 #define BTN_LONGPRESS               FALSE    // Send LongPress evt
 #define BTN_REPEAT                  TRUE   // Send Repeat evt
 #define BTN_COMBO                   FALSE    // Allow combo
 #define BTN_LONG_COMBO              FALSE    // Allow longpress combo
-#define BTN_GETSTATE_REQUIRED       FALSE
+#define BTN_GETSTATE_REQUIRED       TRUE
 
 #define BTN_REPEAT_PERIOD_MS        540
 #define BTN_LONGPRESS_DELAY_MS      999
 #define BTN_DELAY_BEFORE_REPEAT_MS  450
 
 // Define correct button behavior depending on schematic
-#define BTN_IDLE_LOW                TRUE
+#define BTN_IDLE_LOW                FALSE
 // =============================================================================
 
 // Selected depending on Idle state

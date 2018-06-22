@@ -4,6 +4,7 @@
 #include "Sequences.h"
 #include "shell.h"
 #include "uart.h"
+#include "lcd1200.h"
 
 #if 1 // =============== Low level ================
 // Forever
@@ -17,7 +18,7 @@ void ITask();
 int main() {
 #if 1 // Low level init
     // ==== Setup clock ====
-    Clk.SetCoreClk(cclk24MHz);
+    Clk.SetCoreClk(cclk16MHz);
     Clk.UpdateFreqValues();
 
     // ==== Init OS ====
@@ -31,10 +32,14 @@ int main() {
     Printf("\r%S %S\r\n", APP_NAME, XSTRINGIFY(BUILD_TIME));
     Clk.PrintFreqs();
 
-//    Lcd.Init();
-//    Lcd.Cls(clBlack);
+    PinSetupOut(LCD_PWR, omPushPull);
+    PinSetHi(LCD_PWR);
+    chThdSleepMilliseconds(18);
+    Lcd.Init();
+    Lcd.Backlight(100);
+    Lcd.Printf(0, 0, "Aiya Feanaro!");
 
-//    SimpleSensors::Init();
+    SimpleSensors::Init();
 #endif
 
     // ==== Main cycle ====
