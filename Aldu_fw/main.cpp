@@ -29,8 +29,13 @@ static void EnterIdle();
 static void IndicateNewSecond();
 
 static const NeopixelParams_t LedParamsA(NPX_SPI_A, NPX_GPIO_A, NPX_PIN_A, NPX_AF_A, NPX_DMA_A, NPX_DMA_MODE(NPX_DMA_CHNL_A));
+static const NeopixelParams_t LedParamsB(NPX_SPI_B, NPX_GPIO_B, NPX_PIN_B, NPX_AF_B, NPX_DMA_B, NPX_DMA_MODE(NPX_DMA_CHNL_B));
 Neopixels_t NpxA(&LedParamsA);
+Neopixels_t NpxB(&LedParamsB);
 Effects_t BandA(&NpxA);
+Effects_t BandB(&NpxB);
+
+static uint8_t TimeToBrightness(int32_t t, int32_t Offset);
 #endif
 
 int main() {
@@ -63,6 +68,7 @@ int main() {
 
     // Leds
     NpxA.Init();
+    NpxB.Init();
     CommonEffectsInit();
 
     // ==== Main cycle ====
@@ -83,11 +89,11 @@ void ITask() {
             case evtIdButtons:
 //                Printf("Btn %u\r", Msg.BtnEvtInfo.BtnID);
                 MenuHandler((Btns_t)Msg.BtnEvtInfo.BtnID);
-                BandA.AllTogetherSmoothly((Color_t){0,0,255,0}, 450);
+//                BandA.AllTogetherSmoothly((Color_t){0,255,0,0}, 720);
                 break;
 
             case evtIdEverySecond:
-//                BandA.AllTogetherNow((Color_t){0,255,0,0});
+//                BandB.AllTogetherNow((Color_t){0,255,0,0});
                 if(State == stIdle) {
                     Time.GetDateTime();
 //                    Time.Curr.Print();
@@ -117,52 +123,71 @@ void EnterIdle() {
     Lcd.Backlight(0);
 }
 
-void IndicateNewSecond() {
-//    Hypertime.ConvertFromTime();
-//    Printf("HyperH: %u; HyperM: %u\r", Hypertime.H, Hypertime.M);
-//    ResetColorsToOffState(ClrH, ClrM);
+#define ALDU_T1     ((int32_t)(3600 * 3.5))
+#define ALDU_T2     ((int32_t)(3600 * 7))
+#define ALDU_T3     ((int32_t)(3600 * 12))
+#define ALDU_T4     ((int32_t)(3600 * 15.5))
+#define ALDU_T5     ((int32_t)(3600 * 19))
+#define TOP_BRT     255L
 
-    // Calculate target colors
-//    Color_t TargetClrH;
-//    Color_t TargetClrM;
-
-    // ==== Process hours ====
-//    SetTargetClrH(Hypertime.H, TargetClrH);
-//
-//    // ==== Process minutes ====
-//    if(Hypertime.M == 0) {
-//        SetTargetClrM(0, TargetClrM);
-//        SetTargetClrM(12, TargetClrM);
-//    }
-//    else {
-//        SetTargetClrM(Hypertime.M, TargetClrM);
-//    }
-//    WakeMirilli();
+uint8_t TimeToBrightness(int32_t t, int32_t Offset) {
+    int32_t Brt;
+    // Calculate shifted time
+    t = t - Offset;
+    if(t < 0) t += 86400;
+    if(t < ALDU_T1) {
+        // Fade in
+        Brt = (TOP_BRT * t) / ALDU_T1;
+    }
+    else if(t < ALDU_T2) {
+        // Fade out
+        t -= ALDU_T1;
+        Brt = - ((TOP_BRT * t) / ALDU_T1) + TOP_BRT;
+    }
+    else if(t < ALDU_T3) {
+        // Off
+        Brt = 0;
+    }
+    else if(t < ALDU_T4) {
+        // Fade in
+        t -= ALDU_T3;
+        Brt = (TOP_BRT * t) / ALDU_T1;
+    }
+    else if(t < ALDU_T5) {
+        // Fade out
+        t -= ALDU_T4;
+        Brt = - ((TOP_BRT * t) / ALDU_T1) + TOP_BRT;
+    }
+    else {
+        // Off
+        Brt = 0;
+    }
+    return (uint8_t)Brt;
 }
 
-void Hypertime_t::ConvertFromTime() {
-    // Hours
-    int32_t FH = Time.Curr.H;
-    if(FH > 11) FH -= 12;
-    if(H != FH) {
-        H = FH;
-        NewH = true;
+void IndicateNewSecond() {
+    int32_t t = Time.Curr.S + Time.Curr.M * 60 + Time.Curr.H * 3600;
+    static uint8_t BrtTlp = 0, BrtLau = 0;
+    uint8_t Brt;
+    Color_t Clr{0, 0, 0, 0};
+    // Telperion
+    Brt = TimeToBrightness(t, (3600 * 0));
+    if(Brt != BrtTlp) {
+        BrtTlp = Brt;
+//        Printf("Tlp: %u; ", BrtTlp);
+        Clr.W = BrtTlp;
+        BandA.AllTogetherNow(Clr);
     }
-    // Minutes
-    int32_t S = Time.Curr.M * 60 + Time.Curr.S;
-    int32_t FMin = (S + 150) / 300;    // 300s in one hyperminute (== 5 minutes)
-    if(FMin > 11) FMin = 0;
-    if(M != FMin) {
-        M = FMin;
-        NewM = true;
+    // Laurelin
+    Brt = TimeToBrightness(t, (3600 * 6));
+    if(Brt != BrtLau) {
+        BrtLau = Brt;
+//        Printf("Lau: %u\r", Brt);
+        Clr.W = 0;
+        Clr.R = Brt;
+        Clr.G = Brt;
+        BandB.AllTogetherNow(Clr);
     }
-
-//    int32_t S = Time.Curr.M * 60 + Time.Curr.S;
-//    int32_t FMin = S / 150;    // 150s in one hyperminute (== 2.5 minutes)
-//    if(M != FMin) {
-//        M = FMin;
-//        NewM = true;
-//    }
 }
 
 void MenuHandler(Btns_t Btn) {
@@ -253,6 +278,25 @@ void OnCmd(Shell_t *PShell) {
     else if(PCmd->NameIs("Version")) PShell->Printf("%S %S\r", APP_NAME, XSTRINGIFY(BUILD_TIME));
 
 //    else if(PCmd->NameIs("GetBat")) { PShell->Printf("Battery: %u\r", Audio.GetBatteryVmv()); }
+
+    else if(PCmd->NameIs("SetTime")) {
+        DateTime_t dt = Time.Curr;
+        if(PCmd->GetNext<int32_t>(&dt.H) != retvOk) return;
+        if(PCmd->GetNext<int32_t>(&dt.M) != retvOk) return;
+        Time.Curr = dt;
+        Time.SetDateTime();
+        IndicateNewSecond();
+        PShell->Ack(retvOk);
+    }
+
+    else if(PCmd->NameIs("Fast")) {
+        Time.BeFast();
+        PShell->Ack(retvOk);
+    }
+    else if(PCmd->NameIs("Norm")) {
+        Time.BeNormal();
+        PShell->Ack(retvOk);
+    }
 
     else PShell->Ack(retvCmdUnknown);
 }

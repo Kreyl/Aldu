@@ -35,7 +35,7 @@ void Neopixels_t::Init() {
     Params->ISpi.Setup(boMSB, cpolIdleLow, cphaFirstEdge, sclkDiv4, bitn16);
     Params->ISpi.Enable();
     Params->ISpi.EnableTxDma();
-    Printf("Led BufSz=%u bytes\r", sizeof(IBuf));
+//    Printf("Led BufSz=%u bytes\r", sizeof(IBuf));
     // Zero buffer
     for(uint32_t i=0; i<TOTAL_W_CNT; i++) IBuf[i] = 0;
     // Set colors to black

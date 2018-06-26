@@ -21,7 +21,7 @@
 #include "color.h"
 #include "uart.h"
 
-#define LED_CNT             100L   // Number of LEDs
+#define LED_CNT             150L   // Number of LEDs
 
 #define SEQ_LEN             4L   // SPI bits per single bit of LED data
 #define RST_W_CNT           8L   // zero words before and after data to produce reset

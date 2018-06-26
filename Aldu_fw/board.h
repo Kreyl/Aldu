@@ -63,6 +63,11 @@
 #define NPX_PIN_A       3
 #define NPX_AF_A        AF5
 
+#define NPX_SPI_B       SPI3
+#define NPX_GPIO_B      GPIOC
+#define NPX_PIN_B       12
+#define NPX_AF_B        AF6
+
 // I2C
 #define I2C1_GPIO       GPIOB
 #define I2C1_SCL        6
@@ -163,7 +168,7 @@
 
 #if 1 // ========================== USART ======================================
 #define PRINTF_FLOAT_EN FALSE
-#define UART_TXBUF_SZ   1024
+#define UART_TXBUF_SZ   2048
 #define UART_RXBUF_SZ   99
 #define CMD_UART_PARAMS \
     USART1, UART_GPIO, UART_TX_PIN, UART_GPIO, UART_RX_PIN, \
