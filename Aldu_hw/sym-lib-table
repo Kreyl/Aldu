@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name standard_logic)(type Legacy)(uri ${KICAD_SYMBOL_DIR}/standard_logic.lib)(options "")(descr ""))
+  (lib (name "standard_logic")(type "Legacy")(uri "${KICAD_SYMBOL_DIR}/standard_logic.lib")(options "")(descr ""))
+  (lib (name "Aldu-rescue")(type "Legacy")(uri "${KIPRJMOD}/Aldu-rescue.lib")(options "")(descr ""))
 )

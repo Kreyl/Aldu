@@ -64,6 +64,16 @@ int main() {
     BackupSpc::EnableAccess();
     Time.Init();
 
+    // Be fast: 8 times faster
+    chSysLock();
+    Rtc::DisableWriteProtection();
+    Rtc::EnterInitMode();
+    // Program both the prescaler factors
+    RTC->PRER = (15UL << 16) | (0xFFUL);  // async pre = 16, sync = 256 => 32768->8. I.e. 8 seconds within 1 real
+    Rtc::ExitInitMode();
+    Rtc::EnableWriteProtection();
+    chSysUnlock();
+
     SimpleSensors::Init();
 
     // Leds
@@ -167,27 +177,20 @@ uint8_t TimeToBrightness(int32_t t, int32_t Offset) {
 
 void IndicateNewSecond() {
     int32_t t = Time.Curr.S + Time.Curr.M * 60 + Time.Curr.H * 3600;
-    static uint8_t BrtTlp = 0, BrtLau = 0;
     uint8_t Brt;
     Color_t Clr{0, 0, 0, 0};
     // Telperion
     Brt = TimeToBrightness(t, (3600 * 0));
-    if(Brt != BrtTlp) {
-        BrtTlp = Brt;
 //        Printf("Tlp: %u; ", BrtTlp);
-        Clr.W = BrtTlp;
-        BandA.AllTogetherNow(Clr);
-    }
+    Clr.W = Brt;
+    BandA.AllTogetherNow(Clr);
     // Laurelin
     Brt = TimeToBrightness(t, (3600 * 6));
-    if(Brt != BrtLau) {
-        BrtLau = Brt;
 //        Printf("Lau: %u\r", Brt);
-        Clr.W = 0;
-        Clr.R = Brt;
-        Clr.G = Brt;
-        BandB.AllTogetherNow(Clr);
-    }
+    Clr.W = 0;
+    Clr.R = Brt;
+    Clr.G = Brt;
+    BandB.AllTogetherNow(Clr);
 }
 
 void MenuHandler(Btns_t Btn) {

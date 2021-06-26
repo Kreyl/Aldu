@@ -3,3 +3,8 @@ Aldu.graphml
 Aldu_hw/Aldu.csv
 Aldu_hw/Aldu.xml
 AlduBOM.xlsx
+*.dcm
+*.bak
+Aldu_fw/Aldu_converter.log
+Aldu_hw/Aldu-backups/Aldu-2021-06-26_113358.zip
+Aldu_hw/Aldu-backups/

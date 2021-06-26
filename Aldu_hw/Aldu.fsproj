@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--***************************************-->
-<!--   File    : Aldu.fsproj               -->
-<!--   Format  : TopoR Project file        -->
-<!--   Version : 2                         -->
-<!--   Program : TopoR Lite 7.0.18344 Beta -->
-<!--   Date    : Friday, June 01, 2018     -->
-<!--   Time    : 17:03                     -->
-<!--***************************************-->
+<!--*************************************-->
+<!--   File    : Aldu.fsproj             -->
+<!--   Format  : TopoR Project file      -->
+<!--   Version : 2                       -->
+<!--   Program : TopoR Lite 7.0.18427    -->
+<!--   Date    : Saturday, July 14, 2018 -->
+<!--   Time    : 20:59                   -->
+<!--*************************************-->
 
 <Project>
    <Version current="2"/>
    <GUID>{6C0F5BAD-D7BE-4492-91B4-5D08F3B86B66}</GUID>
    <Documents>
       <Section name="PCB" isExpanded="false">
-         <File path=".\Aldu.fsx" isopened="1" dateChange="2018-06-01 14:51:01"/>
+         <File path=".\Aldu.fsx" isopened="1" dateChange="2018-06-01 16:36:16"/>
       </Section>
       <Section name="AutoRouting" isExpanded="false"/>
    </Documents>
