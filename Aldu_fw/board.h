@@ -1,7 +1,7 @@
 /*
  * board.h
  *
- *  Created on: 12 сент. 2015 г.
+ *  Created on: 12 пїЅпїЅпїЅпїЅ. 2015 пїЅ.
  *      Author: Kreyl
  */
 
@@ -11,7 +11,7 @@
 
 // ==== General ====
 #define BOARD_NAME          "Aldu10"
-#define APP_NAME            "Aldu"
+#define APP_NAME            "Arc"
 
 // MCU type as defined in the ST header.
 #define STM32F205xx
@@ -28,10 +28,14 @@
 #define I2C1_ENABLED            FALSE
 #define I2C2_ENABLED            FALSE
 #define I2C3_ENABLED            FALSE
-#define SIMPLESENSORS_ENABLED   TRUE
-#define BUTTONS_ENABLED         TRUE
+#define SIMPLESENSORS_ENABLED   FALSE
+#define BUTTONS_ENABLED         FALSE
 
 #define ADC_REQUIRED            FALSE
+
+
+#define LED_CNT                 150UL   // Number of LEDs
+
 
 #if 1 // ========================== GPIO =======================================
 // EXTI
@@ -80,7 +84,7 @@
 #define USB_AF          AF10
 
 // Radio: SPI, PGpio, Sck, Miso, Mosi, Cs, Gdo0
-#define CC_Setup0       SPI1, GPIOA, 5,6,7, 4, 3
+#define CC_Setup0       SPI1, GPIOA, 5,6,7, GPIOA,4, GPIOA,3
 
 #endif // GPIO
 

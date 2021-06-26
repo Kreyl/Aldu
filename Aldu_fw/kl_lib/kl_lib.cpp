@@ -778,7 +778,7 @@ extern void PrintfCNow(const char *format, ...);
 IrqHandler_t* ExtiIrqHandler[16];
 #else
 #if defined STM32L1XX || defined STM32F4XX || defined STM32F2XX || defined STM32L4XX || defined STM32F1XX
-IrqHandler_t *ExtiIrqHandler[5], *ExtiIrqHandler_9_5, *ExtiIrqHandler_15_10;
+ftVoidVoid ExtiIrqHandler[5], ExtiIrqHandler_9_5, ExtiIrqHandler_15_10;
 #elif defined STM32F030 || defined STM32F0
 IrqHandler_t *ExtiIrqHandler_0_1, *ExtiIrqHandler_2_3, *ExtiIrqHandler_4_15;
 #endif
@@ -796,7 +796,8 @@ IrqHandler_t *ExtiIrqHandler_0_1, *ExtiIrqHandler_2_3, *ExtiIrqHandler_4_15;
 void Vector58() {
     CH_IRQ_PROLOGUE();
     chSysLockFromISR();
-    if(ExtiIrqHandler[0] != nullptr) ExtiIrqHandler[0]->IIrqHandler();
+    ftVoidVoid handler = ExtiIrqHandler[0];
+    if(handler != nullptr) handler();
     else PrintfC("Unhandled %S\r", __FUNCTION__);
     EXTI_PENDING_REG = 0x0001; // Clean IRQ flags
     chSysUnlockFromISR();
@@ -807,7 +808,8 @@ void Vector58() {
 void Vector5C() {
     CH_IRQ_PROLOGUE();
     chSysLockFromISR();
-    if(ExtiIrqHandler[1] != nullptr) ExtiIrqHandler[1]->IIrqHandler();
+    ftVoidVoid handler = ExtiIrqHandler[1];
+    if(handler != nullptr) handler();
     else PrintfC("Unhandled %S\r", __FUNCTION__);
     EXTI_PENDING_REG = 0x0002; // Clean IRQ flags
     chSysUnlockFromISR();
@@ -818,7 +820,8 @@ void Vector5C() {
 void Vector60() {
     CH_IRQ_PROLOGUE();
     chSysLockFromISR();
-    if(ExtiIrqHandler[2] != nullptr) ExtiIrqHandler[2]->IIrqHandler();
+    ftVoidVoid handler = ExtiIrqHandler[2];
+    if(handler != nullptr) handler();
     else PrintfC("Unhandled %S\r", __FUNCTION__);
     EXTI_PENDING_REG = 0x0004; // Clean IRQ flags
     chSysUnlockFromISR();
@@ -829,7 +832,8 @@ void Vector60() {
 void Vector64() {
     CH_IRQ_PROLOGUE();
     chSysLockFromISR();
-    if(ExtiIrqHandler[3] != nullptr) ExtiIrqHandler[3]->IIrqHandler();
+    ftVoidVoid handler = ExtiIrqHandler[3];
+    if(handler != nullptr) handler();
     else PrintfC("Unhandled %S\r", __FUNCTION__);
     EXTI_PENDING_REG = 0x0008; // Clean IRQ flags
     chSysUnlockFromISR();
@@ -840,7 +844,8 @@ void Vector64() {
 void Vector68() {
     CH_IRQ_PROLOGUE();
     chSysLockFromISR();
-    if(ExtiIrqHandler[4] != nullptr) ExtiIrqHandler[4]->IIrqHandler();
+    ftVoidVoid handler = ExtiIrqHandler[4];
+    if(handler != nullptr) handler();
     else PrintfC("Unhandled %S\r", __FUNCTION__);
     EXTI_PENDING_REG = 0x0010; // Clean IRQ flags
     chSysUnlockFromISR();
@@ -856,7 +861,7 @@ void Vector9C() {
         if(ExtiIrqHandler[i] != nullptr) ExtiIrqHandler[i]->IIrqHandler();
     }
 #else
-    if(ExtiIrqHandler_9_5 != nullptr) ExtiIrqHandler_9_5->IIrqHandler();
+    if(ExtiIrqHandler_9_5 != nullptr) ExtiIrqHandler_9_5();
     else PrintfC("Unhandled %S\r", __FUNCTION__);
 #endif
     EXTI_PENDING_REG = 0x03E0; // Clean IRQ flags
@@ -873,7 +878,7 @@ void VectorE0() {
         if(ExtiIrqHandler[i] != nullptr) ExtiIrqHandler[i]->IIrqHandler();
     }
 #else
-    if(ExtiIrqHandler_15_10 != nullptr) ExtiIrqHandler_15_10->IIrqHandler();
+    if(ExtiIrqHandler_15_10 != nullptr) ExtiIrqHandler_15_10();
     else PrintfC("Unhandled %S\r", __FUNCTION__);
 #endif
     EXTI_PENDING_REG = 0xFC00; // Clean IRQ flags
@@ -1999,6 +2004,14 @@ void Clk_t::SetCoreClk(CoreClk_t CoreClk) {
             SetupBusDividers(ahbDiv2, apbDiv1, apbDiv1); // 16 MHz AHB, 16 MHz APB1, 16 MHz APB2
             SetupFlashLatency(16);
             break;
+
+        case cclk20MHz:
+            // 12MHz / 12 * 240 / 6 => 40MHz
+            SetupFlashLatency(20);
+            if(SetupPllMulDiv(12, 240, pllSysDiv6, 6) != retvOk) return;
+            SetupBusDividers(ahbDiv2, apbDiv1, apbDiv1); // 20 MHz AHB, 20 MHz APB1, 20 MHz APB2
+            break;
+
         case cclk24MHz:
             // 12MHz / 6 * 192 / (8 and 8) => 48 and 48MHz
             if(SetupPllMulDiv(6, 192, pllSysDiv8, 8) != retvOk) return;
