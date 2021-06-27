@@ -34,7 +34,7 @@
 #define ADC_REQUIRED            FALSE
 
 
-#define LED_CNT                 150UL   // Number of LEDs
+#define LED_CNT                 150L   // Number of LEDs
 
 
 #if 1 // ========================== GPIO =======================================

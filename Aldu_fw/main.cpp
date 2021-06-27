@@ -6,6 +6,7 @@
 #include "uart.h"
 #include "ws2812b.h"
 #include "radio_lvl1.h"
+#include "Effects.h"
 
 #if 1 // =============== Low level ================
 // Forever
@@ -16,10 +17,27 @@ void OnCmd(Shell_t *PShell);
 void ITask();
 
 static const NeopixelParams_t LedParamsA(NPX_SPI_A, NPX_GPIO_A, NPX_PIN_A, NPX_AF_A, NPX_DMA_A, NPX_DMA_MODE(NPX_DMA_CHNL_A), LED_CNT, npxRGB);
-Neopixels_t NpxA(&LedParamsA);
+Neopixels_t Leds(&LedParamsA);
 
-TmrKL_t TmrTst{MS2ST(270), evtIdEverySecond, tktPeriodic};
+TmrKL_t TmrCheckRx{MS2ST(4005), evtIdCheckRx, tktPeriodic};
+TmrKL_t TmrOff{MS2ST(9999), evtIdOff, tktOneShot};
 #endif
+
+void CheckRxTable() {
+    static bool WasOn = false;
+    RxTable_t& Tbl = Radio.GetRxTable();
+//    Printf("Cnt around: %u\r", Tbl.Cnt);
+    if(Tbl.Cnt > 0) {
+        Printf("Cnt around: %u\r", Tbl.Cnt);
+        TmrOff.StartOrRestart();
+        // Start if not yet
+        if(!WasOn and Tbl.Cnt > 0) {
+            WasOn = true;
+            Effects::PowerOn();
+        }
+    }
+}
+
 
 int main() {
     // ==== Setup clock ====
@@ -38,10 +56,9 @@ int main() {
     Clk.PrintFreqs();
 
     Radio.Init();
-
-    // Leds
-    NpxA.Init();
-    TmrTst.StartOrRestart();
+    Leds.Init();
+    Effects::Init();
+    TmrCheckRx.StartOrRestart();
 
     // ==== Main cycle ====
     ITask();
@@ -58,8 +75,17 @@ void ITask() {
                 ((Shell_t*)Msg.Ptr)->SignalCmdProcessed();
                 break;
 
-            case evtIdEverySecond:
-                NpxA.SetCurrentColors();
+            case evtIdCheckRx:
+                CheckRxTable();
+                break;
+
+            case evtIdLedsDone:
+                Printf("Leds Done\r");
+                break;
+
+            case evtIdOff:
+                Printf("PowerOff\r");
+                Effects::PowerOff();
                 break;
 
             default: break;
@@ -77,6 +103,29 @@ void OnCmd(Shell_t *PShell) {
     else if(PCmd->NameIs("Version")) PShell->Printf("%S %S\r", APP_NAME, XSTRINGIFY(BUILD_TIME));
 
 //    else if(PCmd->NameIs("GetBat")) { PShell->Printf("Battery: %u\r", Audio.GetBatteryVmv()); }
+
+    else if(PCmd->NameIs("SetAll")) {
+        Color_t Clr;
+        if(PCmd->GetParams<uint8_t>(3, &Clr.R, &Clr.G, &Clr.B) == retvOk) {
+            Leds.SetAll(Clr);
+            Leds.SetCurrentColors();
+            PShell->Ack(retvOk);
+        }
+        else PShell->Ack(retvCmdError);
+    }
+
+    else if(PCmd->NameIs("On"))  Effects::PowerOn();
+    else if(PCmd->NameIs("Off")) Effects::PowerOff();
+
+    else if(PCmd->NameIs("Params")) {
+        if(PCmd->GetNext<int32_t>(&Params.SpeedMin) != retvOk) return;
+        if(PCmd->GetNext<int32_t>(&Params.SpeedMax) != retvOk) return;
+        if(PCmd->GetNext<int32_t>(&Params.SizeMin)  != retvOk) return;
+        if(PCmd->GetNext<int32_t>(&Params.SizeMax)  != retvOk) return;
+        if(PCmd->GetNext<int32_t>(&Params.DelayMin) != retvOk) return;
+        if(PCmd->GetNext<int32_t>(&Params.DelayMax) != retvOk) return;
+        PShell->Ack(0);
+    }
 
     else PShell->Ack(retvCmdUnknown);
 }
