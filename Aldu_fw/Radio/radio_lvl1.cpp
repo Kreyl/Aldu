@@ -44,7 +44,7 @@ void rLevel1_t::ITask() {
         CC.Recalibrate();
         if(CC.Receive(450, &PktRx, RPKT_LEN, &PktRx.Rssi) == retvOk) {
             RxTableW->AddOrReplaceExistingPkt(PktRx);
-            Printf("Rx: Id=%u; Rssi=%d\r", PktRx.ID, PktRx.Rssi);
+//            Printf("Rx: Id=%u; Rssi=%d\r", PktRx.ID, PktRx.Rssi);
         }
     } // while true
 }

@@ -337,6 +337,7 @@ namespace Effects {
 void Init() {
     OnOffLayer.BrtBuf.resize(LED_CNT);
     GlobalLayer.ClrBuf.resize(LED_CNT);
+    LocalClrBuf.resize(LED_CNT);
 
     Leds.OnTransmitEnd = OnLedsTransmitEnd;
 
@@ -354,6 +355,8 @@ void PowerOn() {
     OnOffLayer.IsPoweringOn = true;
     OnOffLayer.Init();
     chSysUnlock();
+
+//    Printf("%u %u %u\r", OnOffLayer.BrtBuf.size(), GlobalLayer.ClrBuf.size(), LocalClrBuf.size());
 }
 
 void PowerOff() {

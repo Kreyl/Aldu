@@ -7,6 +7,7 @@
 #include "ws2812b.h"
 #include "radio_lvl1.h"
 #include "Effects.h"
+#include "led.h"
 
 #if 1 // =============== Low level ================
 // Forever
@@ -19,20 +20,24 @@ void ITask();
 static const NeopixelParams_t LedParamsA(NPX_SPI_A, NPX_GPIO_A, NPX_PIN_A, NPX_AF_A, NPX_DMA_A, NPX_DMA_MODE(NPX_DMA_CHNL_A), LED_CNT, npxRGB);
 Neopixels_t Leds(&LedParamsA);
 
+static enum LedsState_t {ledsstOff, ledsstPoweringOn, ledsstPoweringOff, ledsstOn} LedsState = ledsstOff;
+
+LedBlinker_t LedBlink{GPIOB, 2, omPushPull};
+
 TmrKL_t TmrCheckRx{MS2ST(4005), evtIdCheckRx, tktPeriodic};
-TmrKL_t TmrOff{MS2ST(9999), evtIdOff, tktOneShot};
+TmrKL_t TmrOff{MS2ST(63000), evtIdOff, tktOneShot};
 #endif
 
 void CheckRxTable() {
-    static bool WasOn = false;
     RxTable_t& Tbl = Radio.GetRxTable();
 //    Printf("Cnt around: %u\r", Tbl.Cnt);
     if(Tbl.Cnt > 0) {
         Printf("Cnt around: %u\r", Tbl.Cnt);
         TmrOff.StartOrRestart();
         // Start if not yet
-        if(!WasOn and Tbl.Cnt > 0) {
-            WasOn = true;
+        if(LedsState == ledsstOff or LedsState == ledsstPoweringOff) {
+            LedsState = ledsstPoweringOn;
+            Printf("PowerOn\r");
             Effects::PowerOn();
         }
     }
@@ -60,6 +65,9 @@ int main() {
     Effects::Init();
     TmrCheckRx.StartOrRestart();
 
+    LedBlink.Init();
+    LedBlink.StartOrRestart(lbsqBlink);
+
     // ==== Main cycle ====
     ITask();
 }
@@ -80,12 +88,15 @@ void ITask() {
                 break;
 
             case evtIdLedsDone:
-                Printf("Leds Done\r");
+                if(LedsState == ledsstPoweringOn) LedsState = ledsstOn;
+                else LedsState = ledsstOff;
+                Printf("Leds st: %u\r", LedsState);
                 break;
 
             case evtIdOff:
                 Printf("PowerOff\r");
                 Effects::PowerOff();
+                LedsState = ledsstOff;
                 break;
 
             default: break;

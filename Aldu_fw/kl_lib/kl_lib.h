@@ -908,6 +908,7 @@ public:
     void Deinit() const { PinSetupAnalog(PGpio, Pin); }
     void SetHi() const { PinSetHi(PGpio, Pin); }
     void SetLo() const { PinSetLo(PGpio, Pin); }
+    void Toggle() const { PinToggle(PGpio, Pin); }
     void Set(uint8_t Value) {
         if(Value == 0) SetLo();
         else SetHi();

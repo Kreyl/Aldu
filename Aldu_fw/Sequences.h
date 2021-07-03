@@ -1,7 +1,7 @@
 /*
  * Sequences.h
  *
- *  Created on: 09 ÿíâ. 2015 ã.
+ *  Created on: 09 ï¿½ï¿½ï¿½. 2015 ï¿½.
  *      Author: Kreyl
  */
 
@@ -188,7 +188,7 @@ const LedChunk_t lsqBlinkGreenX2[] = {
 };
 #endif
 
-#if 1 // ============================ LED RGB ==================================
+#if 0 // ============================ LED RGB ==================================
 const LedRGBChunk_t lsqStart[] = {
         {csSetup, 99, clRed},
         {csSetup, 99, clGreen},
@@ -234,20 +234,13 @@ const LedRGBChunk_t lsqFailure[] = {
 #endif
 
 #if 1 // ======================== Simple LED blink =============================
-#define BLINK_DELAY_MS      180
-const BaseChunk_t lbsqBlink3[] = {
+#define BLINK_DELAY_MS      720
+const BaseChunk_t lbsqBlink[] = {
         {csSetup, 1},
         {csWait, BLINK_DELAY_MS},
         {csSetup, 0},
         {csWait, BLINK_DELAY_MS},
-        {csSetup, 1},
-        {csWait, BLINK_DELAY_MS},
-        {csSetup, 0},
-        {csWait, BLINK_DELAY_MS},
-        {csSetup, 1},
-        {csWait, BLINK_DELAY_MS},
-        {csSetup, 0},
-        {csEnd}
+        {csGoto, 0}
 };
 #endif
 

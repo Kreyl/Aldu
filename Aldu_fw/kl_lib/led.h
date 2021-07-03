@@ -1,7 +1,7 @@
 /*
  * led_rgb.h
  *
- *  Created on: 31 àâã. 2014 ã.
+ *  Created on: 31 ï¿½ï¿½ï¿½. 2014 ï¿½.
  *      Author: Kreyl
  */
 
@@ -23,6 +23,7 @@ public:
     void Init() { IChnl.Init(); Off(); }
     void On()  { IChnl.SetHi(); }
     void Off() { IChnl.SetLo(); }
+    void Toggle() { IChnl.Toggle(); }
 };
 #endif
 
@@ -221,9 +222,9 @@ public:
                 LedRGBParent_t(ARed, AGreen, ABlue, AFreq) {}
 
     void SetColor(Color_t AColor) {
-        R.Set(AColor.R * AColor.Lum);
-        G.Set(AColor.G * AColor.Lum);
-        B.Set(AColor.B * AColor.Lum);
+        R.Set(AColor.R * AColor.W);
+        G.Set(AColor.G * AColor.W);
+        B.Set(AColor.B * AColor.W);
     }
 };
 #endif

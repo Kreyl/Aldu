@@ -10,9 +10,9 @@
 #include "color.h"
 
 struct Params_t {
-    int32_t SpeedMin=162, SpeedMax=180;
+    int32_t SpeedMin=126, SpeedMax=180;
     int32_t SizeMin=4, SizeMax=18;
-    int32_t DelayMin=180, DelayMax=360;
+    int32_t DelayMin=180, DelayMax=450;
 
     void Print() { Printf("Params: %u %u, %u %u, %u %u\r", SpeedMin, SpeedMax, SizeMin, SizeMax, DelayMin, DelayMax); }
 
